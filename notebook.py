@@ -261,6 +261,7 @@ def show_date(notebook, *args):
         return ExecDate(date1) <= note.exec_date <= ExecDate(date2)
 
     date_find = ExecDate(args[0])
+    
     if len(args) > 1:
         days = int(args[1])
     else:
