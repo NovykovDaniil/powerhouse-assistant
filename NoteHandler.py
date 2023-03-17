@@ -137,7 +137,3 @@ def get_handler(action):
 
 def performer(command: Command, note_instance: NoteBot):
     return command.processing(note_instance)
-
-nb = NoteBot()
-print(performer(get_handler('+'), nb))
-print(performer(get_handler('add tag'), nb))
