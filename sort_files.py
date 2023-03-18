@@ -1,77 +1,99 @@
 import os
 import shutil
-import sys
-from os import path
-import re
+from prettytable import PrettyTable
+
+#Dict for normalize()
+transliterate_dict = {'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e',
+      'ж':'zh','з':'z','и':'i','й':'i','к':'k','л':'l','м':'m','н':'n',
+      'о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h',
+      'ц':'c','ч':'cz','ш':'sh','щ':'scz','ъ':'','ы':'y','ь':'','э':'e',
+      'ю':'u','я':'ja', 'А':'A','Б':'B','В':'V','Г':'G','Д':'D','Е':'E','Ё':'E',
+      'Ж':'ZH','З':'Z','И':'I','Й':'I','К':'K','Л':'L','М':'M','Н':'N',
+      'О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U','Ф':'F','Х':'H',
+      'Ц':'C','Ч':'CZ','Ш':'SH','Щ':'SCH','Ъ':'','Ы':'y','Ь':'','Э':'E',
+      'Ю':'U','Я':'YA','ґ':'','ї':'', 'є':'','Ґ':'g','Ї':'i',
+      'Є':'e', '.':'.', 'x':'x', 'X':'X', 'j':'j', 'J':'J', 'w':'w', 'W':'W'}
 
 
-class CreateDirectory:
-    def create_directory(self, path_1):
-        folder_name = ['images','video','documents','audio','archives','other']
-        names = os.listdir(path_1)
-        for folders in folder_name:
-            path_dir = os.path.join(path_1, folders)
-            if folders not in names:
-                os.makedirs(path_dir)
+# List of numbers for the normalize() function
+numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+# Folders to skip
+ignore_folders = ["images", "video", "documents", "audio", "archives", "other"]
+
+EXTENDS = {
+    ("png", "jpeg", "jpg", "svg"): "\\images\\",
+    (".avi", ".mp4", ".mov", ".mkv"): "\\video\\",
+    (".doc", ".docx", ".txt", ".pdf", ".xlsx", ".pptx"): "\\documents\\",
+    (".mp3", ".ogg", ".wav", ".amr"): "\\audio\\",
+    (".zip", ".tar", ".gz"): "\\archives\\",
+}
 
 
-class Normalize:
-    def normalize(self, path_1):
-        words_list = {'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'ё': 'e', 'e': 'e', 'ж': 'j',
-             'з': 'z', 'и': 'i', 'й': 'j', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o',
-             'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts',
-             'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu',
-             'я': 'ya', 'є': 'je', 'і': 'i', 'ї':'ji', 'ґ': 'g', 'А': 'A', 'Б': 'B', 'В': 'V',
-             'Г': 'G', 'Д': 'D', 'Ё': 'E', 'Е': 'E', 'Ж': 'J', 'З': 'Z', 'И': 'I', 'Й': 'J',
-             'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S',
-             'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Sch',
-             'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya', 'Є': 'Je', 'І': 'I',
-             'Ї':'Ji', 'Ґ': 'G'}
-        names = os.listdir(path_1)
-        for words in names:
-            path_file = os.path.join(path_1, words)
-            if os.path.isfile(path_file):
-                tbl = words.maketrans(words_list)
-                change_words = words.translate(tbl)
-                pref, suf = path.splitext(change_words)
-                change_title = re.sub(r"(\W)", '_', pref)
-                join_words = change_title + suf
-                new_name = os.path.join(path_1, join_words)
-                final = os.rename(path_file, new_name)
-            else:
-                self.normalize(path_file)
-                
-
-class SortFiles:
-    path_root = sys.argv[1]
-    
-    def sort_files(self, path_1):  
-        ignore_name = ['images','video','documents','audio','archives','other']
-        list_files = {('png', 'jpeg', 'jpg', 'svg'): 'images',
-                      ('.avi', '.mp4', '.mov', '.mkv'): 'video',
-                      ('.doc', '.docx', '.txt', '.pdf', '.xlsx', '.pptx'): 'documents',
-                      ('.mp3', '.ogg', '.wav', '.amr'): 'audio',
-                      ('.zip', '.tar', '.gz'): 'archives'}
-        names = os.listdir(path_1)
-        path_other = os.path.join(self.path_root, 'other')
-        for files in names:
-            if files not in ignore_name:
-                path_dir = os.path.join(path_1, files)
-                if os.path.isdir(path_dir):
-                    self.sort_files(path_dir)
-                    os.rmdir(path_dir)
-                elif os.path.isfile(path_dir):
-                    for expansion in list_files:
-                        if files.split('.')[-1] in expansion:
-                            new_path = os.path.join(self.path_root, list_files[expansion])
-                            shutil.move(path_dir, new_path)
-                        else:
-                            shutil.move(path_dir, path_other)
-                        break
-                else:
-                    continue
+# Function to normalize the file name
+def normalize(file_name: str) -> str:
+    for key in transliterate_dict:
+        file_name = file_name.replace(key, transliterate_dict.get(key))
+    for i in file_name:
+        if (
+            i not in transliterate_dict.values()
+            and i not in transliterate_dict.keys()
+            and i not in numbers
+        ):
+            file_name = file_name.replace(i, "_")
+    return file_name
 
 
-CreateDirectory().create_directory(sys.argv[1])
-Normalize().normalize(sys.argv[1])
-SortFiles().sort_files(sys.argv[1])
+def create_folders(path):
+    for ignore_folder in ignore_folders:
+        if ignore_folder not in os.listdir(path):
+            os.mkdir(path + "\\" + ignore_folder)
+    return "Folder to sort has been created"
+
+
+# Recursive folder sort function
+def sorting_function(path):
+    for elem in os.listdir(path):
+        # The basic part
+        if len(elem.split(".")) > 1:
+            for extend, category in EXTENDS.items():
+                if os.path.splitext(elem)[-1] in extend:
+                    current_file = path + "\\" + elem
+                    new_path = path + category + normalize(elem)
+                    counter[category] += 1
+                    shutil.move(current_file, new_path)
+
+            if os.path.splitext(elem)[-1] not in [
+                extend for extends_tup in EXTENDS.keys() for extend in extends_tup
+            ]:
+                current_file = path + "\\" + elem
+                new_path = path + "\\other\\" + normalize(elem)
+                counter["other"] += 1
+                shutil.move(current_file, new_path)
+
+        # The recursive part
+        if (
+            os.path.isdir(path + "\\" + elem)
+            and len(os.listdir(path + "\\" + elem)) == 0
+            and elem not in ignore_folders
+        ):
+            os.rmdir(path + "\\" + elem)
+        elif os.path.isdir(path + "\\" + elem) and elem not in ignore_folders:
+            sorting_function(path + "\\" + elem)
+
+    return "The folder has been sorted!"
+
+
+def start_sorting():
+    counter = {category: 0 for category in ignore_folders}
+    path = input("Enter the path to the folder to sort: ")
+    try:
+        print(sorting_function(path))
+    except FileNotFoundError:
+        return "There is no such file"
+    table = PrettyTable()
+    table.field_names = ["Filetype", "Count"]
+    for category, count in counter.items():
+        table.add_row([category, count])
+    return table
+
