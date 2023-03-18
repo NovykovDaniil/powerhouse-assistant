@@ -67,7 +67,7 @@ class ValidatePhone(Validator):
         if value.replace("+", "").isdigit():
             value = value.replace(" ", "").split("+")
         for phone in value[1:]:
-            if re.match(r"[+380][0-9]{10}", phone):
+            if re.match(r"[+380][0-9]{11}", phone):
                 value_list.append("+" + phone)
             else:
                 value_list.clear()
