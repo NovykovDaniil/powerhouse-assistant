@@ -3,6 +3,18 @@ import pickle
 import re
 from collections import UserDict
 from pathlib import Path
+import logging
+import os
+
+
+logger = logging.getLogger("nb_log")
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter("[%(asctime)s]   %(message)s")
+fh = logging.FileHandler("logs\\note_book.log")
+fh.setLevel(logging.INFO)
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+
 
 N = 5  # number of notes per page
 
@@ -125,18 +137,21 @@ class Note:
 class NoteBook(UserDict):
     id_counter = 0
 
-    def __init__(self, filename: str) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.filename = Path(filename)
+        logger.info('Note book has been created')
+        self.filename = Path("logs\\note_book_auto_save.bin")
         if self.filename.exists():
-            with open(self.filename, "rb") as db:
-                self.data = pickle.load(db)
+            if os.stat(self.filename).st_size:
+                with open(self.filename, "rb") as db:
+                    self.data = pickle.load(db)
         if len(self.data) > 0:
             self.id_counter = max(self.data.keys())
 
     def save(self):
         with open(self.filename, "wb") as db:
             pickle.dump(self.data, db)
+            logger.info('Note book has been saved')
 
     def iterator(self, func=None, sort_by_tags=False):
         index, print_block = 1, "=" * 50 + "\n"
@@ -161,10 +176,14 @@ class NoteBook(UserDict):
     def add_note(self, note_text):
         note = Note(self, note_text)
         self[note.id] = note
+        logger.info(f"Note ID:{note.id} added")
+        self.save()
         return f"Note ID:{note.id} added"
 
     def change_note(self, id_note: int, new_text: str):
         self[id_note].text = new_text
+        logger.info(f"Note ID:{id_note} changed")
+        self.save()
         return f"Note ID:{id_note} changed"
 
     def del_note(self, id_note: int):
@@ -173,6 +192,8 @@ class NoteBook(UserDict):
         )
         if yes_no == "Yes":
             del self[id_note]
+            logger.info(f"Note ID:{id_note} deleted")
+            self.save()
             return f"Note ID:{id_note} deleted"
         else:
             return "Note not deleted!"
@@ -180,6 +201,8 @@ class NoteBook(UserDict):
     def add_date(self, id_note: int, exec_date):
         try:
             self[id_note].exec_date = ExecDate(exec_date)
+            logger.info(f"Date {self[id_note].exec_date} added to note ID:{id_note}")
+            self.save()
             return f"Date {self[id_note].exec_date} added to note ID:{id_note}"
         except KeyError:
             return "There is no contact with such ID"
@@ -237,13 +260,15 @@ class NoteBook(UserDict):
     def done_note(self, id_note):
         if not self[id_note].is_done:
             self[id_note].is_done = True
-            return f"Note ID:{id_note} marked as done"
+            logger.info("Note ID: {id_note} marked as done")
+            return f"Note ID: {id_note} marked as done"
         else:
-            return f"Note ID:{id_note} is already done"
+            return f"Note ID: {id_note} is already done"
 
     def return_note(self, id_note):
         if self[id_note].is_done:
             self[id_note].is_done = False
+            logger.info(f"Note ID:{id_note} marked as not done")
             return f"Note ID:{id_note} marked as not done"
         else:
             return f"Note ID:{id_note} is not done"
@@ -257,6 +282,8 @@ class NoteBook(UserDict):
                 note_tags.remove(tag)
             self[id_note].tags.sort(key=str.lower)
         if note_tags:
+            logger.info(f'Tags {", ".join(sorted(note_tags))} added to note ID:{id_note}')
+            self.save()
             return f'Tags {", ".join(sorted(note_tags))} added to note ID:{id_note}'
         else:
             return f"No tags added to note ID:{id_note}"
@@ -280,6 +307,7 @@ class NoteBook(UserDict):
     def goodbye(self):
         self.save()
         print("\033[034mYou have finished working with self.\033[0m")
+        logger.info('Note book has been closed')
         return "\033[033mGood buy!\033[0m"
 
     def help_me(self):
@@ -293,7 +321,6 @@ class NoteBook(UserDict):
         If you want mark note as done - done <id>;
         If you want mark note as not done - return <id>;
         If you want to show all notes - show all;
-        If you want to show archived notes - show archived;
         If you want to show notes by date +- days - show date <date> [<days>];
         If you want to find note by text - find note <text>;
         If you want to find note by tag - find tag <text>;
