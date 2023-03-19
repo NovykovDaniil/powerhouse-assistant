@@ -7,7 +7,7 @@ from prompt_toolkit import prompt
 
 class NoteBot:
     def __init__(self) -> None:
-        self.note_book = NoteBook("notes.dat")
+        self.note_book = NoteBook()
 
 
 class Command(ABC):
@@ -137,3 +137,16 @@ def get_handler(action):
 
 def performer(command: Command, note_instance: NoteBot):
     return command.processing(note_instance)
+
+
+
+nb = NoteBot()
+while True:
+    act = input('command: ')
+    if act == 'exit':
+        break
+    try:
+        print(performer(get_handler(act), nb))
+    except:
+        print('no command')
+    
