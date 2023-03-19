@@ -57,5 +57,3 @@ def start_calc():
     calculator = Calculator(root)
     root.mainloop()
     return 'Thank you for using our calculator'
-
-print(start_calc())
