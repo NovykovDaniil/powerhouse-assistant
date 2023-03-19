@@ -6,31 +6,16 @@ class Calculator:
         master.title("Calculator")
         master.configure(bg='gray')
 
-        # create display
         self.display = tk.Entry(master, width=20, font=('Arial', 20))
         self.display.grid(row=0, column=0, columnspan=4, pady=5)
 
-        # create buttons
-        self.create_button('7', 1, 0)
-        self.create_button('8', 1, 1)
-        self.create_button('9', 1, 2)
-        self.create_button('/', 1, 3)
-
-        self.create_button('4', 2, 0)
-        self.create_button('5', 2, 1)
-        self.create_button('6', 2, 2)
-        self.create_button('*', 2, 3)
-
-        self.create_button('1', 3, 0)
-        self.create_button('2', 3, 1)
-        self.create_button('3', 3, 2)
-        self.create_button('-', 3, 3)
-
-        self.create_button('0', 4, 0)
-        self.create_button('.', 4, 1)
-        self.create_button('C', 4, 2)
-        self.create_button('+', 4, 3)
-
+        buttons = {'7' : (1,0), '8' : (1,1), '9' : (1,2), '/' : (1,3),
+                   '4' : (2,0), '5' : (2,1), '6' : (2,2), '*' : (2,3),
+                   '1' : (3,0), '2' : (3,1), '3' : (3,2), '-' : (3,3),
+                   '0' : (4,0), '.' : (4,1), 'C' : (4,2), '+' : (4,3),}
+        
+        for button, coordinates in buttons.items():
+            self.create_button(button, *coordinates)
         self.create_button('=', 5, 0, columnspan=4)
 
     def create_button(self, text, row, column, columnspan=1):
