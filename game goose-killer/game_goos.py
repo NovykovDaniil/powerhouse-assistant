@@ -1,7 +1,7 @@
+from math import sin
 import pygame
 import random
 from os import listdir
-from PIL import Image
 from pygame.constants import QUIT, K_DOWN, K_UP, K_RIGHT, K_LEFT, USEREVENT
 
 pygame.init()
@@ -18,16 +18,21 @@ pygame.time.set_timer(CREATE_BONUS, 2500)
 CHANGE_IMG = pygame.USEREVENT + 3
 pygame.time.set_timer(CHANGE_IMG, 125)
 
-BG_PATH = 'image/background'
+BG_PATH = "image/background"
 
-BG_images = [pygame.image.load(BG_PATH + '/' + file).convert() for file in listdir(BG_PATH)]
+BG_images = [
+    pygame.image.load(BG_PATH + "/" + file).convert() for file in listdir(BG_PATH)
+]
 bg = pygame.transform.scale(BG_images[0], screen)
 
 enemies = []
 bonuses = []
-IMGS_PATH = 'image\goose'
+IMGS_PATH = "image\goose"
 
-goose_images = [pygame.image.load(IMGS_PATH + '/' + file).convert_alpha() for file in listdir(IMGS_PATH)]
+goose_images = [
+    pygame.image.load(IMGS_PATH + "/" + file).convert_alpha()
+    for file in listdir(IMGS_PATH)
+]
 goose = goose_images[0]
 lifes_goose = 3
 N = 3
@@ -40,36 +45,47 @@ WHITE = 255, 255, 255
 RED = 255, 0, 0
 game_over_font = pygame.font.SysFont("Arial", 100, bold=True)
 
+
 def exit(point):
-    print(point)
+    print(f"\033[031mYour score is: {point}\033[0m")
     return False
 
 
 def creat_enemy():
-    enemy = pygame.image.load('image\enemy.png').convert_alpha()
-    e = (enemy.get_size())
-    enemy_rect = pygame.Rect(width, random.randint(e[1], heigth - e[1]), *enemy.get_size())
+    enemy = pygame.image.load("image\enemy.png").convert_alpha()
+    e = enemy.get_size()
+    enemy_rect = pygame.Rect(
+        width, random.randint(e[1], heigth - e[1]), *enemy.get_size()
+    )
     enemy_speed = random.randint(1, 7)
     return [enemy, enemy_rect, enemy_speed]
 
 
 def creat_bonus():
-    bonus = pygame.image.load('image/bonus.png').convert_alpha()
-    b = (bonus.get_size())
-    bonus_rect = pygame.Rect(random.randint(b[0], width - b[0]), 0, *bonus.get_size())
+    bonus = pygame.image.load("image/bonus.png").convert_alpha()
+    b = bonus.get_size()
+    bonus_rect = pygame.Rect(
+        random.randint(b[0], width - b[0]), -bonus.get_height(), *bonus.get_size()
+    )
     bonus_speed = random.randint(1, 5)
     return [bonus, bonus_rect, bonus_speed]
 
+
 def display_boom():
-    boom = pygame.image.load('image/boom.png').convert_alpha()
+    boom = pygame.image.load("image/boom.png").convert_alpha()
     main_surface.blit(boom, goose_rect)
-    pygame.time.set_timer(USEREVENT + 4, 9000)
+    pygame.time.set_timer(USEREVENT + 4, 10000)
+
 
 def game_over():
-    game_over = game_over_font.render("GAME OVER", True, RED)
-    main_surface.fill(WHITE)
-    main_surface.blit(game_over, (width/2 - 250, heigth/2 - 100))
-    pygame.time.set_timer(USEREVENT + 5, 9000)
+    game_over = pygame.image.load("image/gameover.png").convert_alpha()
+    game_over_text = game_over_font.render(
+        f"Your score is: {game_bonuses}", True, BLACK
+    )
+    main_surface.blit(game_over, (width / 2 - 250, heigth / 2 - 300))
+    main_surface.blit(game_over_text, (width / 3 - 150, heigth / 2))
+    pygame.display.flip()
+    pygame.time.wait(5000)
 
 
 goose_rect = goose.get_rect()
@@ -117,9 +133,9 @@ while is_working:
     main_surface.blit(goose, goose_rect)
 
     for enemy in enemies:
-        enemy[1] = enemy[1].move(-enemy[2], 0)
+        # enemy[1] = enemy[1].move(-enemy[2], 0)
+        enemy[1] = enemy[1].move(-enemy[2], sin(enemy[1][0] / 40) * 3)
         main_surface.blit(enemy[0], enemy[1])
-
 
         if enemy[1].left < 0:
             enemies.pop(enemies.index(enemy))
@@ -144,9 +160,14 @@ while is_working:
                 bonuses.pop(bonuses.index(bonus))
 
     # print result
-    my_font = pygame.font.Font('font/UA Propisi.ttf', 35)
-    main_surface.blit(my_font.render('Бонуси ' + str(game_bonuses), 1, (255, 180, 255)), (width - 130, 30))
-    main_surface.blit(my_font.render('Життя ' + str(lifes_goose), 1, RED), (width - 1250, 30))
+    my_font = pygame.font.Font("font/UA Propisi.ttf", 35)
+    main_surface.blit(
+        my_font.render("Бонуси " + str(game_bonuses), 1, (255, 180, 255)),
+        (width - 130, 30),
+    )
+    main_surface.blit(
+        my_font.render("Життя " + str(lifes_goose), 1, RED), (width - 1250, 30)
+    )
 
     if Pressed_key[K_DOWN] and goose_rect.bottom < heigth:
         goose_rect = goose_rect.move(0, goose_speed)
@@ -161,5 +182,3 @@ while is_working:
 
 pygame.display.quit()
 pygame.quit()
-
-
