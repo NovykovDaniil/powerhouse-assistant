@@ -1,7 +1,8 @@
+
 from setuptools import setup, find_packages
 
 setup(
-    name="test_version_powerhouse_helper_2",
+    name="test_version_powerhouse_helper",
     version="1",
     description="This is your console assistant by Python Powerhouse",
     author="Python Powerhouse",
@@ -45,6 +46,7 @@ setup(
                 "test_version_powerhouse_helper\\GameGooseKiller\\image\\Goose\\1-3.png",
                 "test_version_powerhouse_helper\\GameGooseKiller\\image\\Goose\\1-4.png",
                 "test_version_powerhouse_helper\\GameGooseKiller\\image\\Goose\\1-5.png",
+
             ],
         ),
     ],
