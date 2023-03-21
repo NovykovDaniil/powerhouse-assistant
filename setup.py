@@ -1,8 +1,9 @@
+
 from setuptools import setup, find_packages
 
 setup(
     name="beta_test_version_powerhouse_helper",
-    version="1.1.1",
+    version="1",
     description="This is your console assistant by Python Powerhouse",
     author="Python Powerhouse",
     license="MIT",
@@ -16,6 +17,7 @@ setup(
     include_package_data=True,
     include_dirs=True,
     install_requires=["prettytable", "prompt-toolkit"],
+
     entry_points={
         "console_scripts": ["powerhouse-helper=test_version_powerhouse_helper.main:run"]
     },
