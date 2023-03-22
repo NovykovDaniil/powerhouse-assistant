@@ -14,7 +14,7 @@ This assistant consists of 5 parts:<br>
   ----------------------
   ### How to install?<br>
   #### Go to the console and enter:
-  <pre>pip install ****</pre>
+  <pre>pip install python-powerhouse-helper==1.0.0</pre>
   ----------------------
   ### How to start the helper? <br>
   Install package, then go to the console and enter:
