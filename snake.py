@@ -1,5 +1,7 @@
 import pygame
 import random
+import sys
+from os import listdir
 
 # Инициализация Pygame
 pygame.init()
@@ -17,6 +19,7 @@ SCREEN_HEIGHT = 600
 # Создание окна
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Змейка")
+
 
 # Определение класса змейки
 class Snake:
@@ -39,12 +42,18 @@ class Snake:
         cur = self.get_head_position()
         x, y = self.direction
         new = ((cur[0] + (x * GRID_SIZE)), (cur[1] + (y * GRID_SIZE)))
-        if new in self.positions[2:]:
+        if (
+            new in self.positions[2:]
+            or not (0 <= new[0] < SCREEN_WIDTH)
+            or not (0 <= new[1] < SCREEN_HEIGHT)
+        ):
             self.reset()
+            return False
         else:
             self.positions.insert(0, new)
             if len(self.positions) > self.length:
                 self.positions.pop()
+            return True
 
     def reset(self):
         self.length = 1
@@ -72,6 +81,7 @@ class Snake:
                 elif event.key == pygame.K_RIGHT:
                     self.turn(RIGHT)
 
+
 # Определение класса еды
 class Food:
     def __init__(self):
@@ -80,12 +90,16 @@ class Food:
         self.randomize_position()
 
     def randomize_position(self):
-        self.position = (random.randint(0, GRID_WIDTH - 1) * GRID_SIZE, random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
+        self.position = (
+            random.randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
+        )
 
     def draw(self, surface):
         r = pygame.Rect((self.position[0], self.position[1]), (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(surface, self.color, r)
         pygame.draw.rect(surface, BLACK, r, 1)
+
 
 # Определение констант направления
 UP = (0, -1)
